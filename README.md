@@ -24,3 +24,17 @@ Usage:
 .zendesk <ticket-number>
 .zendesk 3512
 ```
+
+Centrify
+-------
+
+The plugin currently returns a summary of a user or group from Active Directory
+
+Usage:
+```
+.aduser <username>
+.adgroup <groupname>
+```
+
+Notes: requires the centrify package being installed on the bot server and joined to
+a domain
