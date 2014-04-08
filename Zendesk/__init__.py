@@ -26,7 +26,7 @@ __author__ = supybot.Author('Sijis Aviles', 'sijis',
 __contributors__ = {}
 
 # This is a url where the most recent plugin package can be downloaded.
-__url__ = '' # 'http://supybot.com/Members/yourname/Zendesk/download'
+__url__ = 'https://github.com/sijis/supybot-plugins'
 
 import config
 import plugin
