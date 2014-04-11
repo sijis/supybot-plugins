@@ -71,8 +71,17 @@ class Centrify(callbacks.Plugin):
         (groups_in, groups_err) = self._query_ad('user', ['-G', username])
         try:
             response = out.split(':')
-            groups = groups_in.replace('\n', ',').rstrip(',')
-            results = '{0} ({1}) - {2}'.format(response[4], response[3], groups)
+            groups = groups_in.replace('\n', ', ').rstrip(', ')
+            results = ( 'User: {0}, '
+                        'Name: {1}, '
+                        'Uid: {2}, '
+                        'Groups: {3}'
+                        ).format(
+                            username,
+                            response[4],
+                            response[3],
+                            groups
+                        )
         except IndexError:
             results = 'User "{0}" not found.'.format(username)
 
@@ -84,8 +93,15 @@ class Centrify(callbacks.Plugin):
         (out, error) = self._query_ad('group', group)
         try:
             response = out.split(':')
-            results = '{0} ({1}) - {2}'.format(response[0], response[2],
-response[3].replace('\n', ''))
+            members = response[3].replace(',', ', ').rstrip('\n')
+            results = ( 'Group: {0}, '
+                        'Gid: {1}, '
+                        'Members: {2}'
+                        ).format(
+                            group,
+                            response[2],
+                            members
+                        )
         except IndexError:
             results = 'Group "{0}" not found.'.format(group)
 
