@@ -39,6 +39,7 @@ from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
 import time
 import datetime
+import random
 
 vmutils = utils.python.universalImport('local.vmutils')
 
@@ -59,6 +60,82 @@ class VMware(callbacks.Plugin):
         self.vm_username = self.registryValue('vm_username')
         self.vm_password = self.registryValue('vm_password')
         self.vm_dnsdomain = self.registryValue('vm_dnsdomain')
+
+    def migrate(self, irc, msg, args, vmname, hostname):
+
+        username = self.user
+        password = self.password
+        vcenter = self.vcenter
+
+        try:
+            si = SmartConnect(host=vcenter, user=username, pwd=password, port=443)
+        except:
+            err_text = 'Error connecting to {0}'.format(vcenter)
+            log.info(err_text)
+            irc.reply(err_text)
+            return
+
+        if hostname:
+            try:
+                host = vmutils.get_host_by_name(si, hostname)
+                hostname = host.name
+            except:
+                irc.reply('{0} not found'.format(hostname))
+                return
+        else:
+            # hostname was not passed
+            all_hosts = vmutils.get_hosts(si)
+            host = vmutils.get_host_by_name(si, random.choice(all_hosts.values()))
+            hostname = host.name
+
+        # Finding source VM
+        try:
+            vm = vmutils.get_vm_by_name(si, vmname)
+        except:
+            irc.reply('{0} not found.'.format(vmname))
+            return
+
+        # relocate spec, to migrate to another host
+        # this can do other things, like storage and resource pool
+        # migrations
+        relocate_spec = vim.vm.RelocateSpec(host=host)
+
+        # does the actual migration to host
+        vm.Relocate(relocate_spec)
+        irc.reply('Migrating {0} to {1}'.format(vmname, hostname))
+
+        Disconnect(si)
+    migrate = wrap(migrate, ['somethingWithoutSpaces', optional('somethingWithoutSpaces')])
+
+    def reboot(self, irc, msg, args, vmname):
+
+        username = self.user
+        password = self.password
+        vcenter = self.vcenter
+
+        try:
+            si = SmartConnect(host=vcenter, user=username, pwd=password, port=443)
+        except:
+            err_text = 'Error connecting to {0}'.format(vcenter)
+            log.info(err_text)
+            irc.reply(err_text)
+            return
+
+        # Finding source VM
+        try:
+            vm = vmutils.get_vm_by_name(si, vmname)
+        except:
+            irc.reply('{0} not found.'.format(vmname))
+            return
+
+        try:
+            vm.RebootGuest()
+        except:
+            vm.ResetVM_Task()
+
+        irc.reply('Rebooting {0}'.format(vmname))
+        Disconnect(si)
+    reboot = wrap(reboot, ['somethingWithoutSpaces'])
 
     def clone(self, irc, msg, args, optlist, vmname):
 
@@ -146,7 +223,7 @@ class VMware(callbacks.Plugin):
 
 
         irc.reply('{0}: Request completed'.format(conf['name']))
-
+        Disconnect(si)
 
     clone = wrap(clone, [getopts({
                                 'mem':'int',
