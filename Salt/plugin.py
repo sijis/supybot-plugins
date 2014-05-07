@@ -54,6 +54,7 @@ class Salt(callbacks.Plugin):
         self.paste_api_url = self.registryValue('paste_api_url')
 
     def paste_code(self, code):
+        ''' Post the output to pastebin '''
         request = urllib2.Request(
             self.paste_api_url,
             urllib.urlencode([('content', code)]),
@@ -63,6 +64,11 @@ class Salt(callbacks.Plugin):
 
 
     def pepper(self, irc, msg, args, systems, action, params):
+        """{vm-name | vm-glob} <module> [<params>]
+        Example: .pepper dil-vm-app-*.* cmd.rum 'cat /etc/hosts'
+
+        Returns the link to pastebin of the pepper output
+        """
 
         tgt, fun = systems, action
         api = pepper.Pepper(self.api_url, debug_http=False)
