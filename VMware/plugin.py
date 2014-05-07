@@ -62,7 +62,10 @@ class VMware(callbacks.Plugin):
         self.vm_dnsdomain = self.registryValue('vm_dnsdomain')
 
     def migrate(self, irc, msg, args, vmname, hostname):
-
+        """<vm> [<host>]
+        Migrates the vm to another esx host        
+        Returns the status of migration
+        """
         username = self.user
         password = self.password
         vcenter = self.vcenter
@@ -108,7 +111,10 @@ class VMware(callbacks.Plugin):
     migrate = wrap(migrate, ['somethingWithoutSpaces', optional('somethingWithoutSpaces')])
 
     def reboot(self, irc, msg, args, vmname):
-
+        """<vm>
+        Reboots the vm
+        Returns the status of migration
+        """
         username = self.user
         password = self.password
         vcenter = self.vcenter
@@ -138,6 +144,18 @@ class VMware(callbacks.Plugin):
     reboot = wrap(reboot, ['somethingWithoutSpaces'])
 
     def clone(self, irc, msg, args, optlist, vmname):
+        """<vm> [--{mem, cpu, tmpl, pool, dnsdomain, vcenter}]
+        option details:
+            mem = 1024 (MB) - RAM
+            cpu = 1 (int) - CPUs
+            tmpl = centos6 (str) - template to use
+            pool = DEV (str) - resource pool
+            dnsdomain = domain.local (str) - dns domain search
+            vcenter = vcenter1.domain.local - vcenter server
+
+        Creates a vm from a template
+        Returns the status of clone
+        """
 
         opts = dict(optlist)
 
