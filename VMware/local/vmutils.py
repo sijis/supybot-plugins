@@ -79,6 +79,12 @@ def get_vm_by_name(si, name):
     """
     return _get_obj(si.RetrieveContent(), [vim.VirtualMachine], name)
 
+def get_host_by_name(si, name):
+    """
+    Find an esx host by it's name and return it
+    """
+    return _get_obj(si.RetrieveContent(), [vim.HostSystem], name)
+
 def get_resource_pool(si, name):
     """
     Find a virtual machine by it's name and return it
